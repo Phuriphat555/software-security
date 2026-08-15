@@ -8,16 +8,21 @@
 
 ## Part 1 — Student Information
 | Name | Student ID | Date | Group |
-|---|---|---|---|
+|Phuriphat Chantiuaong|6631503034|15/8/2026|---|
 | | | | |
 
 ## Part 2 — Lecture Questions
 Answer in your own words (2–4 sentences each).
 1. Distinguish SAST, DAST, and SCA — what does each see, and when in the SDLC does each run?
+   Answer SAST analyzes source code without running the application, so it can find problems in the code during development or CI. DAST tests a running application from the outside, so it can find runtime and behavior-related problems. SCA checks third-party libraries and dependencies for known vulnerabilities and is normally used during development and CI.
 2. What is secret scanning, and why do hardcoded secrets keep ending up in repos?
+   Answer Secret scanning searches source code and repositories for sensitive information such as API keys, passwords, tokens, and private credentials. Hardcoded secrets often end up in repositories because developers put configuration directly in code for convenience, forget to remove test credentials, or accidentally commit configuration files.
 3. What does "shift-left / DevSecOps" mean in practice for a CI pipeline?
+   Answer Shift-left means moving security checks earlier in the development process instead of waiting until the application is ready for production. In a CI pipeline, this can mean automatically running SAST, SCA, and secret scanning on every pull request or commit and blocking the build when serious vulnerabilities are found.
 4. Why is coverage-guided fuzzing considered the dominant modern bug-finding technique?
+   Answer Coverage-guided fuzzing generates many inputs and uses code-coverage feedback to find inputs that reach new parts of the program. This allows the fuzzer to explore paths that simple random testing may miss and can discover crashes and memory-safety bugs automatically.
 5. Define true positive vs. false positive in scanner triage, and why misclassifying both directions is costly.
+   Answer A true positive is a scanner finding that correctly identifies a real security problem. A false positive is a finding reported by the scanner that is not actually a vulnerability. Missing a real vulnerability can leave the application exposed, while treating too many false positives as real problems wastes developer time and can cause important findings to be ignored.
 
 ![A left to right SDLC pipeline showing SAST at write code, secret scanning at commit, SCA and fuzzing at build, and DAST at deploy, with what each tool cannot see written underneath it.](img/sdlc-gates.svg)
 
