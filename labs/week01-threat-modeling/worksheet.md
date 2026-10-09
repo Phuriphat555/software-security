@@ -57,12 +57,10 @@ Source to model lives in `sample-app/app.py`. Template to fill: `THREAT-MODEL-TE
 **What to submit per task:** the threat/element identified + a screenshot (DFD, table, or running app) + a 2–3 sentence mitigation.
 
 **Task 0 — Onboarding (5 min)** · *Goal:* prove the environment works. *Steps:* `docker compose up`, hit `/notes` and `/files/<name>`, read `sample-app/app.py`. *Deliverable:* screenshot of the running app + the JSON response.
-= ![alt text](image.png)
 
 answer ![alt text](image.png)
 
 **Task 1 — Draw the DFD (25 min)** · *Goal:* map the system. *Steps:* identify the external entity (web client), the process (Flask app), the data store (`notes.db` SQLite), the `uploads/` store, and the flows for `/notes`, `/upload`, `/files/<name>`; mark the Internet→app trust boundary with a dashed line. *Deliverable:* DFD image embedded in your copy of the template.
-= ![alt text](image-1.png)
 
 answer  Element	Type	Description	Trust Boundary
 Web Client	External Entity	Sends requests to the Flask application	Yes
@@ -103,7 +101,6 @@ DFD
                  ![alt text](image-2.png)
 
 **Task 2 — STRIDE the elements (30 min)** · *Goal:* enumerate threats per element. *Steps:* for each element fill the S/T/R/I/D/E grid. Ground it in real code: `/notes` accepts a client-supplied `owner` with no auth (Spoofing); `/upload` saves raw `f.filename` — arbitrary-file-write (Tampering) — and echoes the resolved save path back in its response (Information disclosure); `/files/<name>` reads it back but is comparatively defended (see Task 5); no logging anywhere (Repudiation). *Deliverable:* completed STRIDE table.
-= 
 
 answer  ![alt text](image-2.png)
 
@@ -112,6 +109,7 @@ notes.db	No strong owner identity is enforced by the application	Unauthorized us
 uploads/	Uploaded content is associated with attacker-controlled filenames	Raw filenames can cause arbitrary file writes/path traversal	No record of who uploaded a file	The resolved save path is returned by /upload	Unlimited uploads can consume disk space	A malicious uploaded file could potentially affect files outside the intended upload directory
 
 **Task 3 — Elevation of Privilege game (20 min)** · *Goal:* find threats you missed. *Steps:* play the EoP deck against your DFD; each card you can tie to a real element/flow scores a point; record every valid threat. No printer or scissors? Draw from the digital deck below instead — same 78 cards, same rule. *Deliverable:* list of carded threats + score.
+
 ```sim
 eop-deck
 Cards drawn: 10 · Tied to my DFD: 6
@@ -136,15 +134,6 @@ trust-boundary
 *Deliverable:* the boundary list, two owned-element reachability notes, one written chain, and the system claim.
 
 **Task 4 — Abuse cases & attacker personas (20 min)** · *Goal:* think like specific adversaries. *Steps:* define 2 personas (e.g. a curious logged-in user; an anonymous internet attacker) and write 2 abuse cases each against the sample app, tied to DFD elements. *Deliverable:* 4 abuse cases.
-=Persona 1: Anonymous Internet Attacker (Unauthenticated)
-Abuse Case 1 (DFD Element: /notes): An unauthenticated remote attacker iterates through common usernames in the owner query parameter to dump and view internal user notes without credentials.
-
-Abuse Case 2 (DFD Element: /upload): An attacker submits a POST request containing ../ sequences in f.filename to overwrite critical configuration files or place malicious scripts into accessible directories.
-
-Persona 2: Malicious Internal User (Low-Privilege Logged-In User)
-Abuse Case 3 (DFD Element: /upload & Server Path Disclosure): A low-privilege user uploads a harmless file, extracts the server's absolute internal directory path from the response, and uses it to map out target files for path traversal attacks.
-
-Abuse Case 4 (DFD Element: notes.db via /notes): A registered user crafts HTTP requests targeting /notes with owner=admin to inject unauthorized records directly into the shared database context.
 
 answer
 Persona 1 — Anonymous Internet Attacker
@@ -198,16 +187,6 @@ Target: /notes
 Impact: If authorization is not enforced, users may access data they do not own.
 
 **Task 5 — Path-traversal deep-dive (25 min)** · *Goal:* analyze the riskiest flow. *Steps:* trace `/upload` → `/files/<name>`; explain how `../` in a filename escapes `uploads/`; sketch the secure design (`secure_filename`, store outside web root, allow-list extensions). *Deliverable:* the data flow + secure-design note.
-=[Client POST /upload] 
-        │
-        ▼ (Raw f.filename received, e.g. "../../tmp/malicious.py")
-[Flask Endpoint /upload]
-        │
-        ▼ (Saves directly without sanitization & returns absolute path)
-[Filesystem Storage /uploads/../../tmp/malicious.py]
-        │
-        ▼ (Client requests file)
-[Flask Endpoint /files/<name>] ──► [Reads and returns target file]
 
 answer
 Web Client
@@ -267,13 +246,6 @@ Store outside web root
 Return only safe resource information
 
 **Task 6 — Threat-model the project target (30 min)** · *Goal:* kick off your term project. *Steps:* stop the sample-app first (`docker compose down` — both apps bind host port 8080), then run **NoteVault** (`cd ../../project/starter-app && docker compose up`), draw a quick DFD, and list the top 3 STRIDE threats you'd investigate. *Deliverable:* NoteVault DFD + top-3 threats (reuse these in your project report — `project/REPORT-TEMPLATE.md` in the repo root).
-=[ Client Browser ]
-         │  (HTTP / Auth / Notes API)
-         ▼  [Trust Boundary 1: Public Internet]
-  [ NoteVault Flask App ]
-    │                │
-    ▼                ▼  [Trust Boundary 2: Data Tier]
-[ SQLite DB ]  [ Upload Store ]
 
 answer
 INTERNET
@@ -336,12 +308,6 @@ The system must record important security-sensitive requests with the authentica
 Mapped threat: Repudiation
 
 **Task 8 — Defend / fix it: rank & mitigate (25 min) 🛡️** · *Goal:* turn threats into action you can prove. *Steps:* rank the top 5 threats by likelihood × impact; propose one concrete mitigation each (e.g., auth on `/notes`, `secure_filename()` + allowlist for `/upload`, request logging for Repudiation, size/rate limits for DoS). Then **pick one and actually implement it** in your fork.
-=Rank,Threat,Likelihood,Impact,Score,Proposed Mitigation
-1,Tampering / EoP: Arbitrary File Write via /upload path traversal,High,High,Critical,Enforce secure_filename() + extension allow-list + store outside web root.
-2,Spoofing / Elevation: Unauthenticated Note Access via /notes,High,High,Critical,Implement session-based authentication and strict owner-to-session validation.
-3,Information Disclosure: Server path leakage in /upload response,High,Medium,Medium,Remove absolute path details from API responses; return generic success payloads/UUIDs.
-4,Repudiation: Missing centralized application logs,Medium,Medium,Medium,"Integrate a logging middleware capturing user ID, endpoint, timestamp, and client IP."
-5,Denial of Service: Unrestricted upload file size,Medium,Medium,Medium,Implement MAX_CONTENT_LENGTH limits in Flask configuration.
 
 *Deliverable — the top-5 table, plus for the one you implemented:*
 1. the **diff** (commit hash on your `wk01` branch),
@@ -503,7 +469,6 @@ f.save(save_path)
 This approach separates the user-provided filename from the actual server-side storage name.
 
 > Disclose your AI use in the Part 1 table. This task counts toward your **Defense + Reflection** score.
-=
 
 ---
 
