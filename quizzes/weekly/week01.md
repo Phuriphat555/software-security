@@ -2,19 +2,20 @@
 
 **~10 min · 6 questions · low-stakes** (counts toward the weekly-quiz grade; lowest scores dropped). Individual.
 
-**Name:** ____________  **Student ID:** ________
-
+**Name:** Phuriphat Chantiuaong  **Student ID:** 6631503034
 ## MCQ (5 × 1)
 1. Which STRIDE letter maps to **Authorization**?
-   a) S  b) T  c) I  d) E
+   d) E
 2. A **trust boundary** is:
-   a) a firewall rule  b) where data crosses between components of different privilege  c) a TLS cert  d) an API key
+   b) where data crosses between components of different privilege
 3. The **attack surface** of a web page is:
-   a) its CSS  b) every input an attacker can reach  c) its database size  d) its uptime
-4. Threat modeling is most valuable:
-   a) after release  b) only after a breach  c) at design time, before code  d) during marketing
-5. An uploaded filename `../../etc/passwd` is an attempt at:
-   a) XSS  b) path traversal (information disclosure)  c) SQLi  d) DoS
+   b) every input an attacker can reach
+1. Threat modeling is most valuable:
+   c) at design time, before code
+2. An uploaded filename `../../etc/passwd` is an attempt at:
+   b) path traversal (information disclosure)
 
 ## Short answer (1 × 3)
 6. In one sentence, what is the difference between a **use case** and a **misuse case**?
+   Answers
+   A use case describes how a legitimate user achieves a goal, while a misuse case describes how an attacker or malicious user can abuse the system to cause harm.

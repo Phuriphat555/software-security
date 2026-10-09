@@ -1,67 +1,49 @@
-# Threat Model — <app name>
+# Threat Model — <Sample Flask App>
 
 ## 1. Data-flow diagram
-                   [ Web Client ]
-                    /    |     \
-                   /     |      \
-             /notes   /upload   /files/<name>
-                 \       |       /
-                  \      |      /
-             - - - - - - - - - - - -
-                  INTERNET TRUST
-                     BOUNDARY
-             - - - - - - - - - - - -
-                       |
-                       v
-                 [ Flask App ]
-                    /     \
-                   /       \
-                  v         v
-             [notes.db]  [uploads/]
-               SQLite      files
-![alt text](image-1.png)
-
+(Insert your DFD image. Mark trust boundaries with dashed lines.)
+= ![alt text](image-1.png)
 
 ## 2. Elements & trust boundaries
-| Element                | Type (process/store/entity/flow) | Trust boundary crossed?                                        |
-| ---------------------- | -------------------------------- | -------------------------------------------------------------- |
-| Web client             | External entity                  | Yes (Internet → app)                                           |
-| Flask app              | Process                          | Yes (receives data from Web client and accesses DB/filesystem) |
-| SQLite DB (`notes.db`) | Data store                       | Yes (Flask app → DB)                                           |
-| `uploads/` store       | Data store                       | Yes (Flask app → filesystem / uploaded files)                  |
-
-
+Element	                 Type (process/store/entity/flow)	       Trust boundary crossed?
+Web client	                     external entity	                yes (Internet → app)
+Flask app	                         process	                    yes (Internet → app)
+SQLite DB (notes.db)	             data store	                    yes (app → data store)
+uploads/ store	                      ata store	                    yes (app → file store)
+ 
 ## 3. STRIDE analysis
-| Element | S | T | R | I | D | E |
-|---|---|---|---|---|---|---|
-
-| /notes |Impersonation due to missing authentication |Modify notes through crafted requests |User actions cannot be reliably traced |Notes may be exposed to unauthorized users |Large numbers of requests can overload the database |Exploiting the Flask app's privileges to access the DB |
-
-| /upload |Upload files as another user |Modify or replace uploaded files |Deny having uploaded a file |Sensitive uploaded files may be exposed |Large file uploads can exhaust storage/resources |Upload malicious scripts or executable files |
-
-| /files/<name> |Access files without proper authentication |Modify files that should be read-only |File access cannot be properly attributed |Path traversal may expose files outside uploads/ |Excessive file requests can overload the server/storage |Path traversal or unsafe file handling may lead to access to sensitive files or code execution |
+![alt text](image.png)
 
 ## 4. Top 5 risks (likelihood × impact) + mitigation
-1.Path Traversal in /files/<name> — High × High
-An attacker may use paths such as ../ to access files outside the uploads/ directory.
-Mitigation: Use secure_filename() or a filename whitelist and ensure the resolved path always stays inside uploads/.
+1. Path Traversal / Arbitrary File Write — Critical
+Likelihood: High
+Impact: High
+Risk: Critical
+The /upload endpoint uses the client-controlled f.filename when saving a file. An attacker may manipulate the filename using path traversal such as ../ and cause the application to write outside the intended uploads/ directory.
+Mitigation: Use secure_filename(), allow-list file extensions, generate server-side filenames, and ensure uploaded files are stored only in the intended directory.
 
-2.Malicious File Upload in /upload — High × High
-An attacker may upload executable or malicious files.
-Mitigation: Restrict file types and sizes, generate filenames on the server, store uploads outside the web root, and disable code execution in the upload directory.
+2. Missing Authentication on /notes — Critical
+Likelihood: High
+Impact: High
+Risk: Critical
+The /notes endpoint accepts an owner value directly from the client without authentication. An attacker can therefore claim to be another owner.
+Mitigation: Require authentication and obtain the owner identity from the authenticated session/token instead of trusting the client-provided owner.
 
-3.Unauthorized File Access / IDOR — Medium-High × High
-A user may access another user's files if authorization checks are missing.
-Mitigation: Verify file ownership/authorization before serving files and use random, unpredictable file IDs instead of easily guessed filenames.
+3. Missing Authorization — High
+Likelihood: Medium
+Impact: High
+Risk: High
+The application may allow a user to access or modify resources belonging to another user if ownership is not checked.
+Mitigation: Perform server-side authorization checks for every protected note and file operation.
 
-4.Denial of Service through File Upload — High × Medium-High
-Attackers may upload very large or numerous files, exhausting disk space or server resources.
-Mitigation: Set MAX_CONTENT_LENGTH, limit upload frequency/number, and monitor available storage.
+4. Information Disclosure — Medium
+Likelihood: Medium
+Impact: Medium
+Risk: Medium
+The /upload endpoint echoes the resolved save path in its response. This can reveal information about the server's file-system structure.
+Mitigation: Return only a safe file identifier or filename and never expose the server's absolute file-system path.
 
-5.SQL Injection / Data Tampering in /notes — Medium × High
-If user input is directly concatenated into SQL queries, attackers may read or modify database contents.
-Mitigation: Use parameterized queries/ORM, validate input, and follow the principle of least privilege.
-
-
-
-///////////////////////////////////////////////////////////////////////////////////
+5. Denial of Service Through Uploads — Medium
+Likelihood: Medium
+Impact: Medium
+Risk: Medium
