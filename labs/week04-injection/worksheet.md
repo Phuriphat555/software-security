@@ -113,7 +113,7 @@ Answer
    Task 3 (ping RCE) → CWE-78 OS Command Injection
    Task 4 (upload) → CWE-434 Unrestricted Upload of File with Dangerous Type
 
-All four vulnerabilities fall under **OWASP 2025 A05 Injection** because they share the same underlying problem: the application directly passes **user-controlled input** into a **powerful interpreter** (such as a SQL engine, OS shell, or filesystem) without properly separating **data** from **code or commands**.
+   All four vulnerabilities fall under **OWASP 2025 A05 Injection** because they share the same underlying problem: the application directly passes **user-controlled input** into a **powerful interpreter** (such as a SQL engine, OS shell, or filesystem) without properly separating **data** from **code or commands**.
 
 2. **Real breach:** the **2017 Equifax breach** exposed ~147M people after attackers exploited a known input-handling flaw (Apache Struts CVE-2017-5638). In 3–4 sentences, connect that failure to the lessons in this lab (untrusted input reaching a powerful interpreter; the cost of an unpatched/unvalidated input path).
    Answer

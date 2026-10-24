@@ -271,21 +271,21 @@ INTERNET
 Top 3 STRIDE Threats to Investigate
 1. Spoofing
 
-An attacker may attempt to impersonate another NoteVault user if authentication is weak or missing.
+   An attacker may attempt to impersonate another NoteVault user if authentication is weak or missing.
 
-Investigation: Check whether every protected request requires a valid authenticated identity.
+   Investigation: Check whether every protected request requires a valid authenticated identity.
 
 2. Tampering
 
-An attacker may attempt to modify another user's notes by changing an identifier in a request.
+   An attacker may attempt to modify another user's notes by changing an identifier in a request.
 
-Investigation: Check whether the server verifies that the authenticated user owns the requested note.
+   Investigation: Check whether the server verifies that the authenticated user owns the requested note.
 
 3. Information Disclosure
 
-An attacker may attempt to access another user's notes or sensitive user information.
+   An attacker may attempt to access another user's notes or sensitive user information.
 
-Investigation: Check authorization on every data-access endpoint.
+   Investigation: Check authorization on every data-access endpoint.
 
 **Task 7 — Security requirements (15 min)** · *Goal:* turn threats into testable requirements. *Steps:* write 3 security requirements as acceptance criteria ("the system must … so that …"), each mapped to a threat from Task 2 or Task 6. *Deliverable:* 3 testable security requirements.
 answer
@@ -328,23 +328,23 @@ Rank	Threat	Likelihood	Impact	Risk	Mitigation
 Mitigation Details
 1. Path Traversal
 
-Use filename sanitization and server-generated filenames. Do not allow an arbitrary user-provided string to become a path component.
+   Use filename sanitization and server-generated filenames. Do not allow an arbitrary user-provided string to become a path component.
 
 2. Authentication
 
-Require authentication for protected endpoints and derive the owner from the authenticated session/token rather than accepting it directly from the client.
+   Require authentication for protected endpoints and derive the owner from the authenticated session/token rather than accepting it directly from the client.
 
 3. Authorization
 
-After authentication, verify that the authenticated user owns or has permission to access the requested resource.
+   After authentication, verify that the authenticated user owns or has permission to access the requested resource.
 
 4. Information Disclosure
 
-Return a safe logical file identifier instead of exposing the server's resolved file-system path.
+   Return a safe logical file identifier instead of exposing the server's resolved file-system path.
 
 5. DoS Protection
 
-Limit upload sizes and request rates so that an attacker cannot easily exhaust CPU, memory, or disk resources.
+   Limit upload sizes and request rates so that an attacker cannot easily exhaust CPU, memory, or disk resources.
 
 Task 8 — Implemented Fix
 Selected Finding
