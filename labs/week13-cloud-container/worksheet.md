@@ -12,7 +12,7 @@
 
 | Name | Student ID | Date | Group |
 |------|-----------|------|-------|
-| [YOUR NAME] | 6631503034 | 2026-10-24 | [GROUP] |
+| Phuriphat Chantiuaong | 6631503034 | 2026-10-24 | --- |
 
 <div style="color:#2ea043">
 
@@ -205,7 +205,7 @@ The hardened app still works with all three runtime flags on, so the hardening d
 **Task 5 — Flag tally**
 
 Expected hunt structure: 6 container defects + 3 IAM defects = 9 possible found-and-fixed flags.
-Your verified flag count: **9 / 9** found and fixed (self-scored; this lab does not issue flag strings). Container: `:latest`, root user, secret `ENV`, `COPY . .`, `chmod 777`, unpinned pip. IAM: `Action:*`, `Resource:*`, no `Condition`. Note: I count the pip flag only together with the `==` + `--require-hashes` fix described in Task 4.
+Your verified flag count: **8 / 9** found and fixed (self-scored; this lab does not issue flag strings). Found and fixed: container `:latest`, root user, secret `ENV`, `COPY . .`, `chmod 777`; IAM `Action:*`, `Resource:*`, no `Condition`. Found but only partly fixed: unpinned pip. The hardened build uses a venv and `--no-cache-dir`, but `requirements.txt` still says `Flask>=3.1.3`, so I do not claim that flag until it is `Flask==3.1.3` with `--require-hashes` (see Task 4).
 Biggest-risk misconfiguration: the full-admin IAM policy, because one leaked credential can affect every action and resource in the account rather than only the app's required S3 prefix.
 
 </div>
@@ -251,7 +251,7 @@ Biggest-risk misconfiguration: the full-admin IAM policy, because one leaked cre
   cropped window carries nothing that identifies you, and the lab's own output is
   byte-identical for the whole cohort *by design*, so the stamp is the only thing that makes
   the shot yours. Generic or borrowed evidence is not accepted.
-- **Personalized flag (if this lab issues one):** 🟢 N/A — this lab does not issue a flag string (self-scored 9/9, see Task 5).
+- **Personalized flag (if this lab issues one):** 🟢 N/A — this lab does not issue a flag string (self-scored 8/9, see Task 5).
   *Flags are unique per student — submitting another student's flag is a violation. How to submit: **learn.zcr.ai/submit** (full guide: [SUBMISSION.md](../../SUBMISSION.md) in the repo root).*
 - **Explain in your own words** *(graded on your reasoning, not copied text):*
   1. What did you do, and **why did the vulnerability work**?
