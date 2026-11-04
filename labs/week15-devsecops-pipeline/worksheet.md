@@ -16,7 +16,7 @@
 
 <div style="color:#2ea043">
 
-🟢 **AI use disclosure:** AI assistants (Claude Code, Opus 5.5, and GitHub Copilot) were used to draft written answers, to produce the AI fix that is critiqued in *Audit the AI*, for the *Prompt Problem*, and to help run and record the lab commands and scans. The stamped `evidence-week15-task0-security-log.png`, `evidence-week15-actions-run.png`, `evidence-week15-code-scanning.png`, `evidence-week15-pr-checks.png`, `evidence-week15-pr-trivy-log.png`, `evidence-week15-pr-alerts.png` and `evidence-week15-verification.png` screenshots were run and captured by Claude Code on my machine, at my request, on 2026-10-31. Claude Code also opened PR #3 at my request. I signed in to GitHub myself for the steps that needed it. Any other screenshots with the `whoami | ID | date` stamp were captured by me on my own machine and my own fork.
+🟢 **AI use disclosure:** AI assistants (Claude Code, Opus 5.5, and GitHub Copilot) were used to draft written answers, to produce the AI fix that is critiqued in *Audit the AI*, for the *Prompt Problem*, and to help run and record the lab commands and scans. Claude Code also wrote the helper script that runs each evidence step, prints the `whoami | ID | date` stamp and places the browser beside the terminal, and it opened PR #3 at my request. Every stamped screenshot in this worksheet (`stamp-week15-*.png`) was captured by me, at my own keyboard, on 2026-11-03 and 2026-11-04.
 
 </div>
 
@@ -125,7 +125,7 @@ level=INFO    logger=security event=authz_success outcome=allow subject=alice sr
 
 Every line is `key=value`, so a SIEM can parse and alert on `event`, `outcome`, `subject` and `src_ip`. The token `nope` never appears in the log.
 
-![Week 15 Task 0 service terminal showing the three event= security log lines with the identity stamp](evidence-week15-task0-security-log.png)
+![Week 15 Task 0 service terminal showing the three event= security log lines with the identity stamp](stamp-week15-task0-logs.png)
 
 **Task 1 — Logging & fail-closed (A09 / A10)**
 
@@ -169,9 +169,9 @@ My fork (`Phuriphat555/software-security`) already runs the course's `security-c
 
 Run: https://github.com/Phuriphat555/software-security/actions/runs/40064173915: jobs `SAST (Semgrep)`, `SCA + image scan (Trivy)`, `Secret scanning (Gitleaks)`, `Tests (live-quiz platform)` all executed.
 
-![Week 15 Actions run 40064173915 with all four jobs green, beside the identity stamp terminal](evidence-week15-actions-run.png)
+![Week 15 Actions run 40064173915 with all four jobs green, beside the identity stamp terminal](stamp-week15-task2-actions.png)
 
-![Week 15 Security Code scanning page showing 0 open and 2 closed alerts on main, beside the identity stamp terminal](evidence-week15-code-scanning.png)
+![Week 15 Security Code scanning page showing 0 open and 2 closed alerts on main, beside the identity stamp terminal](stamp-week15-task2-codescanning.png)
 
 **Task 3 — Blue team: pass the gate**
 
@@ -208,9 +208,7 @@ I also checked the other two planted defects locally, one at a time:
 
 Result on the PR (run https://github.com/Phuriphat555/software-security/actions/runs/41177330401): `SCA + image scan (Trivy)` failed at step *Trivy filesystem scan (deps + misconfig)* with `exit code 1`, while `SAST (Semgrep)`, `Secret scanning (Gitleaks)` and `Tests (live-quiz platform)` passed. The gate writes Trivy's output as SARIF (`format: sarif`), so the job log does not list the CVEs. They appear as 8 open Code scanning alerts for `pr:3`, all in `redteam-wk15/requirements.txt`. GitHub's check summary reads "8 new alerts including 6 high severity security vulnerabilities".
 
-![Week 15 PR 3 checks with SCA + image scan (Trivy) failing, beside the identity stamp terminal](evidence-week15-pr-checks.png)
-![Week 15 Trivy job log ending with exit code 1, beside the identity stamp terminal](evidence-week15-pr-trivy-log.png)
-![Week 15 Code scanning alerts for PR 3 listing urllib3 findings in redteam-wk15/requirements.txt, beside the identity stamp terminal](evidence-week15-pr-alerts.png)
+![Week 15 Task 4: PR #3 run, SCA + image scan (Trivy) job failed at the Trivy filesystem scan step with "Error: Process completed with exit code 1", beside the identity stamp terminal](stamp-week15-task4-pr-fail.png)
 
 **Task 5 — Score Break-the-Build**
 
@@ -403,6 +401,6 @@ a wrong token, and explain how to force an exception to prove it still returns 4
 
 Verified result: the code the AI produced from this prompt is the version in *Audit the AI* §3. I ran it against the same five cases. No header, `bob-token`, a wrong token and a forced `RuntimeError` all return **403** with a `logger=security` line, the token value never appears in the log, and `alice-token` still returns **200**. Compared with the first prompt (*"Fix it"*), naming the sink (`USERS[token]` + `except`), every path's expected status, the two CWEs to avoid on the error path, and the exact log format removed every weakness found in the audit. **With the fixed `admin()` in place, the Task 1b exploit (`GET /admin` with no header) now returns 403 instead of the flag.**
 
-![Week 15 verification run of the fixed admin(): four 403 responses and one 200 with the security log lines and the identity stamp](evidence-week15-verification.png)
+![Week 15 verification run of the fixed admin(): four 403 responses and one 200 with the security log lines and the identity stamp](stamp-week15-prompt-verify.png)
 
 </div>
